@@ -28,114 +28,152 @@
 Выполнена подготовка [конфигурации Terraform](https://github.com/death13rule/devops-cw/tree/ec3a0438bb85ad55ce1de5ea1be2043ab232102d/terraform). Переменные, носящие конфиденциальный характер, такие как folder_id, ssh_public_key, sa_id, ansible_user вынесены в terraform.tfvars, который в свою очередь включен в .gitignore, поэтому данный файл отсутствует в репозитории. Все составляющие элементы инфраструктуры (ВМ, сети, группы безопасности и т.д.) вынесены в отдельные файлы конфигурации для удобства.
 
 Общая структура конфигурации Terraform:
+
 ![Terraform config structure](https://github.com/death13rule/devops-cw/blob/ec3a0438bb85ad55ce1de5ea1be2043ab232102d/screenshots/terraform-structure.png)
 
 Проверка конфигурации Terraform (fmt, init, validate):
+
 ![Terraform fmt, init, validate](https://github.com/death13rule/devops-cw/blob/ec3a0438bb85ad55ce1de5ea1be2043ab232102d/screenshots/terraform-fmt-init-validate.png)
 
 Terraform plan:
+
 ![Terraform plan](https://github.com/death13rule/devops-cw/blob/ec3a0438bb85ad55ce1de5ea1be2043ab232102d/screenshots/terraform-plan.png)
 
 Выполнено развёртывание конфигурации в облаке (Terraform apply):
+
 ![Terraform apply](https://github.com/death13rule/devops-cw/blob/ec3a0438bb85ad55ce1de5ea1be2043ab232102d/screenshots/terraform-apply.png)
 
 Для Ansible был подготовлен шаблон inventory.tfpl который сразу выводит актуальные IP адреса из Output в ansible/inventory.ini:
+
 ![Terraform output](https://github.com/death13rule/devops-cw/blob/ec3a0438bb85ad55ce1de5ea1be2043ab232102d/screenshots/terraform-apply.png)
 
 ## 3. Ansible
 Выполнена подготовка [конфигурации Ansible](https://github.com/death13rule/devops-cw/tree/ec3a0438bb85ad55ce1de5ea1be2043ab232102d/ansible). Для удобства навигации и редактирования конфигурации был использован механизм ролей (Roles). Конфиденциальные переменные помещены в Ansible vault.
 
 Общая структура конфигурации Ansible:
+
 ![Ansible structure](https://github.com/death13rule/devops-cw/blob/ec3a0438bb85ad55ce1de5ea1be2043ab232102d/screenshots/ansible-structure.png)
 
 Проверка корректности конфигурации осуществлялась посредством syntax-check и lint:
+
 ![Ansible syntax check](https://github.com/death13rule/devops-cw/blob/8c11270e9f57269a132a18f10f82c5dbbd696561/screenshots/ansible-syntax-check.png)
+
 ![Ansible lint](https://github.com/death13rule/devops-cw/blob/8c11270e9f57269a132a18f10f82c5dbbd696561/screenshots/ansible-lint.png)
 
 Проверка доступности хостов all ping:
+
 ![Ansible all ping](https://github.com/death13rule/devops-cw/blob/8c11270e9f57269a132a18f10f82c5dbbd696561/screenshots/ansible-all-ping.png)
 
 После выполнения всех проверок была выполнена настройка хостов (Ansible playbook):
+
 ![Ansible playbook](https://github.com/death13rule/devops-cw/blob/8c11270e9f57269a132a18f10f82c5dbbd696561/screenshots/ansible-playbook-site.png)
 
 ## 3. Проверка развёрнутой инфраструктуры
 После разворачивания инфраструктуры была выполнена проверка работоспособности инфраструктуры.
 
 Curl ALB:
+
 ![Curl Website](https://github.com/death13rule/devops-cw/blob/8c11270e9f57269a132a18f10f82c5dbbd696561/screenshots/curl-website.png)
 
 Curl Elasticsearch (через Bastion):
+
 ![Curl Elasticsearch](https://github.com/death13rule/devops-cw/blob/8c11270e9f57269a132a18f10f82c5dbbd696561/screenshots/curl-website.png)
 
 Filebeat test config and output (web-a, через Bastion):
+
 ![Filebeat test config and output web-a](https://github.com/death13rule/devops-cw/blob/8c11270e9f57269a132a18f10f82c5dbbd696561/screenshots/filebeat-test-output-a.png)
 
 Filebeat test config and output (web-b, через Bastion):
+
 ![Filebeat test config and output web-a](https://github.com/death13rule/devops-cw/blob/8c11270e9f57269a132a18f10f82c5dbbd696561/screenshots/filebeat-test-config-b.png)
 
 Systemctl Zabbix-server (через Bastion):
+
 ![Zabbix-server status](https://github.com/death13rule/devops-cw/blob/8c11270e9f57269a132a18f10f82c5dbbd696561/screenshots/systemctl-status-zabbix-server.png)
 
 Systemctl Zabbix-agent (через Bastion):
+
 ![Zabbix-agent status](https://github.com/death13rule/devops-cw/blob/8c11270e9f57269a132a18f10f82c5dbbd696561/screenshots/systemctl-status-zabbix-agent.png)
 
 Web-сайт (проверка с внешнего IP):
+
 ![Web-site](https://github.com/death13rule/devops-cw/blob/8c11270e9f57269a132a18f10f82c5dbbd696561/screenshots/web-site.png)
 
 ## 4. Zabbix
 После проверки инфраструктуры была выполнена настройка Zabbix server. На дашборд вынесены основные метрики работы виртуальных машин, а так же сетевая нагрузка на веб-серверы и монитор проблем по всем хостам.
 
 Zabbix dashboard:
+
 ![Zabbix dashboard](https://github.com/death13rule/devops-cw/blob/8c11270e9f57269a132a18f10f82c5dbbd696561/screenshots/zabbix-dashboard.png)
 
 ## 5. Kibana
 Была выполнена настройка Kibana для отображения данных, получаемых от filebeat с веб-серверов:
 
 Kibana:
+
 ![Kibana](https://github.com/death13rule/devops-cw/blob/8c11270e9f57269a132a18f10f82c5dbbd696561/screenshots/kibana-web.png)
 
 ## 6. Yandex.Cloud
 Ниже представлены все элементы созданной инфраструктуры из Yandex.Cloud.
 
 Infrastructure map:
+
 ![Infrastructure map](https://github.com/death13rule/devops-cw/blob/8c11270e9f57269a132a18f10f82c5dbbd696561/screenshots/infrastructure-map.png)
 
 Network and subnets:
+
 ![Network](https://github.com/death13rule/devops-cw/blob/8c11270e9f57269a132a18f10f82c5dbbd696561/screenshots/network.png)
+
 ![Subnets](https://github.com/death13rule/devops-cw/blob/8c11270e9f57269a132a18f10f82c5dbbd696561/screenshots/network-subs.png)
 
 NAT Gateway:
+
 ![NAT Gateway](https://github.com/death13rule/devops-cw/blob/8c11270e9f57269a132a18f10f82c5dbbd696561/screenshots/gateway.png)
 
 Virtual machines:
+
 ![VMs](https://github.com/death13rule/devops-cw/blob/8c11270e9f57269a132a18f10f82c5dbbd696561/screenshots/virtual-machines.png)
 
 Security Groups:
+
 ![All groups](https://github.com/death13rule/devops-cw/blob/8c11270e9f57269a132a18f10f82c5dbbd696561/screenshots/sg-all-groups.png)
+
 ![SG balancer](https://github.com/death13rule/devops-cw/blob/8c11270e9f57269a132a18f10f82c5dbbd696561/screenshots/sg-balancer.png)
+
 ![SG bastion](https://github.com/death13rule/devops-cw/blob/8c11270e9f57269a132a18f10f82c5dbbd696561/screenshots/sg-bastion.png)
+
 ![SG es](https://github.com/death13rule/devops-cw/blob/8c11270e9f57269a132a18f10f82c5dbbd696561/screenshots/sg-bastion.png)
+
 ![SG kibana](https://github.com/death13rule/devops-cw/blob/8c11270e9f57269a132a18f10f82c5dbbd696561/screenshots/sg-kibana.png)
+
 ![SG web](https://github.com/death13rule/devops-cw/blob/8c11270e9f57269a132a18f10f82c5dbbd696561/screenshots/sg-web.png)
+
 ![SG zabbix agent](https://github.com/death13rule/devops-cw/blob/8c11270e9f57269a132a18f10f82c5dbbd696561/screenshots/sg-zabbix-agent.png)
+
 ![SG zabbix server](https://github.com/death13rule/devops-cw/blob/8c11270e9f57269a132a18f10f82c5dbbd696561/screenshots/sg-zabbix.png)
 
 Target group:
+
 ![Target group](https://github.com/death13rule/devops-cw/blob/8c11270e9f57269a132a18f10f82c5dbbd696561/screenshots/target-groups.png)
 
 Backend group:
+
 ![Backend group](https://github.com/death13rule/devops-cw/blob/8c11270e9f57269a132a18f10f82c5dbbd696561/screenshots/backend-groups.png)
 
 Application load balancer:
+
 ![ALB](https://github.com/death13rule/devops-cw/blob/8c11270e9f57269a132a18f10f82c5dbbd696561/screenshots/alb.png)
 
 Application load balancer router:
+
 ![ALB Router](https://github.com/death13rule/devops-cw/blob/8c11270e9f57269a132a18f10f82c5dbbd696561/screenshots/alb-router.png)
 
 ALB map:
+
 ![ALB map](https://github.com/death13rule/devops-cw/blob/8c11270e9f57269a132a18f10f82c5dbbd696561/screenshots/balancer-map.png)
 
 Backup schedule:
+
 ![Backup](https://github.com/death13rule/devops-cw/blob/8c11270e9f57269a132a18f10f82c5dbbd696561/screenshots/backup-schedule.png)
 
 
