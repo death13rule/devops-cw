@@ -1,0 +1,39 @@
+- name: Configure all servers
+  hosts: all
+  become: true
+  roles:
+    - common
+
+- name: Configure bastion server
+  hosts: bastion_gp
+  become: true
+  roles:
+    - zabbix-agent
+
+- name: Configure web servers
+  hosts: web_gp
+  become: true
+  roles:
+    - nginx
+    - zabbix-agent
+    - filebeat
+
+- name: Configure Elasticsearch server
+  hosts: es_gp
+  become: true
+  roles:
+    - elasticsearch
+    - zabbix-agent
+
+- name: Configure Kibana server
+  hosts: kibana_gp
+  become: true
+  roles:
+    - kibana
+    - zabbix-agent
+
+- name: Configure Zabbix server
+  hosts: zabbix_gp
+  become: true
+  roles:
+    - zabbix-server

@@ -1,0 +1,12 @@
+- name: Update apt
+  ansible.builtin.apt:
+    update_cache: true
+
+- name: Install packages
+  ansible.builtin.apt:
+    name:
+      - curl
+      - vim
+      - unzip
+      - python3-pip
+    state: present

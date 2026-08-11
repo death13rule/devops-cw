@@ -1,0 +1,32 @@
+[bastion_gp]
+bastion ansible_host=${bastion_ip}
+
+[zabbix_gp]
+zabbix ansible_host=${zabbix_ip}
+
+[es_gp]
+elasticsearch ansible_host=${es_ip}
+
+[kibana_gp]
+kibana ansible_host=${kibana_ip}
+
+[web_gp]
+web_a ansible_host=${web_a_ip}
+web_b ansible_host=${web_b_ip}
+
+[internal:children]
+zabbix_gp
+es_gp
+kibana_gp
+web_gp
+
+[all:vars]
+ansible_user=${ansible_user}
+ansible_python_interpreter=/usr/bin/python3
+timezone="Europe/Moscow"
+
+[internal:vars]
+ansible_ssh_common_args='-o ProxyJump=${ansible_user}@${bastion_ip} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
+
+[bastion_gp:vars]
+ansible_ssh_common_args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'

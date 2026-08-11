@@ -1,0 +1,21 @@
+- name: Install Elasticsearch
+  ansible.builtin.apt:
+    deb: "https://mirror.yandex.ru/mirrors/elastic/7/pool/main/e/elasticsearch/elasticsearch-7.15.1-amd64.deb"
+
+- name: Copy Elasticsearch config file
+  ansible.builtin.copy:
+    src: "{{ role_path }}/files/elasticsearch.yml"
+    dest: /etc/elasticsearch/elasticsearch.yml
+    mode: '0640'
+    owner: elasticsearch
+    group: elasticsearch
+
+- name: Daemon reload
+  ansible.builtin.systemd:
+    daemon_reload: true
+
+- name: Restart and enable Elasticsearch
+  ansible.builtin.service:
+    name: elasticsearch
+    state: restarted
+    enabled: true

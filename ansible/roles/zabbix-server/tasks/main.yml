@@ -1,0 +1,129 @@
+- name: Install common apps
+  ansible.builtin.apt:
+    name:
+      - wget
+      - gnupg2
+      - python3-pymysql
+      - locales
+    state: present
+    update_cache: true
+
+- name: Generate en_US.UTF-8 locale
+  community.general.locale_gen:
+    name: en_US.UTF-8
+    state: present
+
+- name: Set default locale
+  ansible.builtin.lineinfile:
+    path: /etc/default/locale
+    regexp: '^LANG='
+    line: 'LANG=en_US.UTF-8'
+
+- name: Download Zabbix repository package
+  ansible.builtin.get_url:
+    url: https://repo.zabbix.com/zabbix/7.4/release/debian/pool/main/z/zabbix-release/zabbix-release_latest_7.4+debian13_all.deb
+    dest: /tmp/zabbix-release.deb
+    mode: '0644'
+
+- name: Install Zabbix repository package
+  ansible.builtin.apt:
+    deb: /tmp/zabbix-release.deb
+
+- name: Install Zabbix server, frontend, agent and MariaDB
+  ansible.builtin.apt:
+    name:
+      - mariadb-server
+      - mariadb-client
+      - apache2
+      - zabbix-server-mysql
+      - zabbix-frontend-php
+      - zabbix-apache-conf
+      - zabbix-sql-scripts
+      - zabbix-agent
+    state: present
+    update_cache: true
+
+- name: Start and enable MariaDB
+  ansible.builtin.systemd:
+    name: mariadb
+    state: started
+    enabled: true
+
+- name: Create Zabbix database
+  community.mysql.mysql_db:
+    name: zabbix
+    collation: utf8mb4_bin
+    encoding: utf8mb4
+    state: present
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+
+- name: Create Zabbix database user
+  community.mysql.mysql_user:
+    name: zabbix
+    password: "{{ zabbix_db_password }}"
+    priv: 'zabbix.*:ALL'
+    host: localhost
+    state: present
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+
+- name: Enable log_bin_trust_function_creators for import
+  community.mysql.mysql_variables:
+    variable: log_bin_trust_function_creators
+    value: 1
+    mode: global
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+
+- name: Import Zabbix initial schema
+  ansible.builtin.shell: |
+    set -o pipefail
+    zcat /usr/share/zabbix/sql-scripts/mysql/server.sql.gz |
+    mysql --default-character-set=utf8mb4 \
+      -uzabbix \
+      -p'{{ zabbix_db_password }}' \
+      zabbix
+  args:
+    executable: /bin/bash
+    creates: /var/lib/mysql/.zabbix_schema_imported
+  register: schema_imported
+
+- name: Mark schema as imported
+  ansible.builtin.file:
+    path: /var/lib/mysql/.zabbix_schema_imported
+    state: touch
+    owner: root
+    group: root
+    mode: '0600'
+  when: schema_imported.rc == 0
+
+- name: Disable log_bin_trust_function_creators after import
+  community.mysql.mysql_variables:
+    variable: log_bin_trust_function_creators
+    value: 0
+    mode: global
+    login_unix_socket: /var/run/mysqld/mysqld.sock
+
+- name: Configure Zabbix Server DB password
+  ansible.builtin.lineinfile:
+    path: /etc/zabbix/zabbix_server.conf
+    regexp: "^#?DBPassword="
+    line: "DBPassword={{ zabbix_db_password }}"
+  notify: Restart Zabbix-server
+
+- name: Configure PHP timezone for Zabbix frontend
+  ansible.builtin.lineinfile:
+    path: /etc/apache2/conf-available/zabbix.conf
+    regexp: '^.*php_value.*date\.timezone.*$'
+    line: 'php_value date.timezone Europe/Moscow'
+    insertafter: EOF
+  notify: Restart Apache2
+
+- name: Start and enable Zabbix services
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    state: started
+    enabled: true
+    daemon_reload: true
+  loop:
+    - mariadb
+    - zabbix-server
+    - zabbix-agent
