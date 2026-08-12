@@ -77,7 +77,7 @@ Curl ALB:
 
 Curl Elasticsearch (через Bastion):
 
-![Curl Elasticsearch](https://github.com/death13rule/devops-cw/blob/8c11270e9f57269a132a18f10f82c5dbbd696561/screenshots/curl-website.png)
+![Curl Elasticsearch](https://github.com/death13rule/devops-cw/blob/d5fb527f6363a365f484bbc9530051e1a3638e56/screenshots/curl-es.png)
 
 Filebeat test config and output (web-a, через Bastion):
 
