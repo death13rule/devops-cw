@@ -47,6 +47,7 @@ plan.json
 
 *.pem
 *.key
+*.tfplan
 terraform/ssh/
 
 ansible/inventory.ini
